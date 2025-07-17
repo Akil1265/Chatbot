@@ -1,0 +1,171 @@
+{
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "Hi",
+                "Hello",
+                "Hey",
+                "Good morning",
+                "Good evening"
+            ],
+            "responses": [
+                "Hello! 😊 How can I assist you today?",
+                "Hi there! What brings you here?",
+                "Hey! Need any help or just want to chat?",
+                "Greetings! How can I make your day better?",
+                "Hi! Is there something you'd like to know?"
+            ]
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "Bye",
+                "See you",
+                "Goodbye"
+            ],
+            "responses": [
+                "Goodbye! 👋 If you need anything else, just say hi again.",
+                "See you soon! Have a wonderful day!",
+                "Take care! Come back if you want to chat more.",
+                "Bye! It was nice talking to you."
+            ]
+        },
+        {
+            "tag": "name",
+            "patterns": [
+                "What is your name?",
+                "Who are you?"
+            ],
+            "responses": [
+                "I'm your friendly chatbot, always here to help! 🤖",
+                "I am a Python-powered assistant, ready to chat!",
+                "You can call me ChatBuddy! What's your name?"
+            ]
+        },
+        {
+            "tag": "thanks",
+            "patterns": [
+                "Thanks",
+                "Thank you",
+                "That's helpful",
+                "Thank you so much"
+            ],
+            "responses": [
+                "You're welcome! 😊 Anything else I can do for you?",
+                "Happy to help! If you have more questions, just ask.",
+                "Anytime! I love helping out.",
+                "No problem! Let me know if you need anything else."
+            ]
+        },
+        {
+            "tag": "help",
+            "patterns": [
+                "Can you help me?",
+                "I need help",
+                "Help me",
+                "What can you do?"
+            ],
+            "responses": [
+                "I'm here to help! What do you need assistance with?",
+                "Of course! Just let me know your question or problem.",
+                "I can answer questions, tell jokes, or just chat. What would you like to do?",
+                "Sure, I'm listening. How can I help you today?"
+            ]
+        },
+        {
+            "tag": "weather",
+            "patterns": [
+                "What's the weather like?",
+                "Tell me the weather",
+                "Is it raining?",
+                "How's the weather today?"
+            ],
+            "responses": [
+                "I can't check the weather right now, but I hope it's sunny and bright where you are! ☀️",
+                "Sorry, I don't have weather data, but I hope you're having a great day regardless!",
+                "I wish I could tell you, but I bet it's perfect for a chat!"
+            ]
+        },
+        {
+            "tag": "time",
+            "patterns": [
+                "What time is it?",
+                "Tell me the time",
+                "Current time",
+                "Can you tell me the time?"
+            ],
+            "responses": [
+                "I can't tell the exact time, but I know it's always a good time to chat! ⏰",
+                "Time flies when you're having fun!",
+                "Check your device clock for the exact time, but I'm always here for you."
+            ]
+        },
+        {
+            "tag": "joke",
+            "patterns": [
+                "Tell me a joke",
+                "Make me laugh",
+                "Do you know any jokes?"
+            ],
+            "responses": [
+                "Why did the computer show up at work late? It had a hard drive! 😄",
+                "Why don't scientists trust atoms? Because they make up everything! 😂",
+                "Why did the math book look sad? Because it had too many problems.",
+                "Want to hear another joke? Just ask!"
+            ]
+        },
+        {
+            "tag": "age",
+            "patterns": [
+                "How old are you?",
+                "What's your age?"
+            ],
+            "responses": [
+                "I'm as young as the code that created me! Age is just a number for a chatbot. 😁",
+                "I was born the moment you started this chat!",
+                "Old enough to be wise, young enough to learn new things!"
+            ]
+        },
+        {
+            "tag": "creator",
+            "patterns": [
+                "Who created you?",
+                "Who is your creator?",
+                "Who made you?"
+            ],
+            "responses": [
+                "I was created by a developer using Python! 🐍",
+                "A human programmer brought me to life. Do you like coding?",
+                "My creator loves technology and helping people!"
+            ]
+        },
+        {
+            "tag": "feeling",
+            "patterns": [
+                "How are you?",
+                "How are you feeling?",
+                "Are you okay?"
+            ],
+            "responses": [
+                "I'm just a bunch of code, but I'm always happy to chat! How are you?",
+                "I'm always here to help you! How are you feeling today?",
+                "I'm doing great, thanks for asking!"
+            ]
+        },
+        {
+            "tag": "unknown",
+            "patterns": [
+                "asdkjhasd",
+                "qwertyuiop",
+                "blablabla"
+            ],
+            "responses": [
+                "Sorry, I didn't understand that. Could you say it another way?",
+                "Can you rephrase your question? I'm here to help!",
+                "I'm not sure I understand, but I'm learning every day! 😊",
+                "Let's try again—what would you like to talk about?"
+            ]
+        }
+    ]
+}
