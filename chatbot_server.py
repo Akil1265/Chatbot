@@ -1,15 +1,36 @@
-from flask import send_from_directory
-import os
-from flask import Flask, request, jsonify
-import random
-import json
-import nltk
-from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
+import traceback
+import sys
+print('Starting chatbot_server: importing modules...')
+try:
+    from flask import send_from_directory
+    import os
+    from flask import Flask, request, jsonify
+    import random
+    import json
+    import nltk
+    from nltk.stem import WordNetLemmatizer
+    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.naive_bayes import MultinomialNB
 
-nltk.download('punkt')
-nltk.download('wordnet')
+    def ensure_nltk_resources():
+        """Ensure required NLTK resources are available; download quietly if missing."""
+        resources = {
+            'punkt': 'tokenizers/punkt',
+            'wordnet': 'corpora/wordnet'
+        }
+        for name, path in resources.items():
+            try:
+                nltk.data.find(path)
+            except LookupError:
+                print(f"NLTK resource '{name}' not found; downloading...")
+                nltk.download(name, quiet=True)
+
+    ensure_nltk_resources()
+    print('Modules imported and NLTK resources ensured.')
+except Exception:
+    print('Error during imports or NLTK setup:')
+    traceback.print_exc()
+    sys.exit(1)
 
 lemmatizer = WordNetLemmatizer()
 
@@ -44,6 +65,8 @@ def get_response(tag):
     for intent in data["intents"]:
         if intent["tag"] == tag:
             return random.choice(intent["responses"])
+    # Fallback if no intent matches
+    return "Sorry, I didn't understand that. Can you rephrase?"
 
 
 app = Flask(__name__)
@@ -63,4 +86,11 @@ def chat():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print('Starting Flask app...')
+    try:
+        # Disable the reloader to keep a single process and make output deterministic
+        app.run(host='127.0.0.1', port=5000, debug=True, use_reloader=False)
+    except Exception:
+        print('Error while running Flask app:')
+        traceback.print_exc()
+        sys.exit(1)

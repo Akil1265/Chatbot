@@ -5,8 +5,19 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-nltk.download('punkt')
-nltk.download('wordnet')
+def ensure_nltk_resources():
+    resources = {
+        'punkt': 'tokenizers/punkt',
+        'wordnet': 'corpora/wordnet'
+    }
+    for name, path in resources.items():
+        try:
+            nltk.data.find(path)
+        except LookupError:
+            nltk.download(name, quiet=True)
+
+
+ensure_nltk_resources()
 
 lemmatizer = WordNetLemmatizer()
 
