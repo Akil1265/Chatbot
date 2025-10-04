@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - NLP Conversation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(176, 196, 222, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #0078d7 0%, #00c6fb 100%);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .chat-header .bot-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.bot .message-bubble {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-bubble {
+            background: #0078d7;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .bot-avatar {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .user-avatar {
+            background: #0078d7;
+            color: #fff;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #0078d7;
+        }
+
+        .send-button {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: #0078d7;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .send-button:hover {
+            background: #106ebe;
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0078d7;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="bot-icon">🤖</div>
+            <span>AI Chatbot</span>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                👋 Hello! I'm your AI assistant. Ask me anything!
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="avatar bot-avatar">🤖</div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="userInput" class="input-field" placeholder="Type your message..." maxlength="500">
+            <button id="sendButton" class="send-button">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // NLP Intents Data (embedded for static deployment)
+        const intentsData = {
+            "intents": [
+                {
+                    "tag": "greeting",
+                    "patterns": ["hi", "hello", "hey", "good morning", "good evening", "greetings"],
+                    "responses": [
+                        "Hello! 😊 How can I assist you today?",
+                        "Hi there! What brings you here?",
+                        "Hey! Need any help or just want to chat?",
+                        "Greetings! How can I make your day better?",
+                        "Hi! Is there something you'd like to know?"
+                    ]
+                },
+                {
+                    "tag": "goodbye",
+                    "patterns": ["bye", "see you", "goodbye", "farewell", "talk later"],
+                    "responses": [
+                        "Goodbye! 👋 If you need anything else, just say hi again.",
+                        "See you soon! Have a wonderful day!",
+                        "Take care! Come back if you want to chat more.",
+                        "Bye! It was nice talking to you."
+                    ]
+                },
+                {
+                    "tag": "name",
+                    "patterns": ["what is your name", "who are you", "your name", "tell me your name"],
+                    "responses": [
+                        "I'm your friendly chatbot, always here to help! 🤖",
+                        "I am a Python-powered assistant, ready to chat!",
+                        "You can call me ChatBuddy! What's your name?"
+                    ]
+                },
+                {
+                    "tag": "thanks",
+                    "patterns": ["thanks", "thank you", "that's helpful", "thank you so much", "appreciate"],
+                    "responses": [
+                        "You're welcome! 😊 Anything else I can do for you?",
+                        "Happy to help! If you have more questions, just ask.",
+                        "Anytime! I love helping out.",
+                        "No problem! Let me know if you need anything else."
+                    ]
+                },
+                {
+                    "tag": "help",
+                    "patterns": ["can you help me", "i need help", "help me", "what can you do", "assist"],
+                    "responses": [
+                        "I'm here to help! What do you need assistance with?",
+                        "Of course! Just let me know your question or problem.",
+                        "I can answer questions, tell jokes, or just chat. What would you like to do?",
+                        "Sure, I'm listening. How can I help you today?"
+                    ]
+                },
+                {
+                    "tag": "weather",
+                    "patterns": ["what's the weather like", "tell me the weather", "is it raining", "how's the weather today"],
+                    "responses": [
+                        "I can't check the weather right now, but I hope it's sunny and bright where you are! ☀️",
+                        "Sorry, I don't have weather data, but I hope you're having a great day regardless!",
+                        "I wish I could tell you, but I bet it's perfect for a chat!"
+                    ]
+                },
+                {
+                    "tag": "time",
+                    "patterns": ["what time is it", "tell me the time", "current time", "can you tell me the time"],
+                    "responses": [
+                        "I can't tell the exact time, but I know it's always a good time to chat! ⏰",
+                        "Time flies when you're having fun!",
+                        "Check your device clock for the exact time, but I'm always here for you."
+                    ]
+                },
+                {
+                    "tag": "joke",
+                    "patterns": ["tell me a joke", "make me laugh", "do you know any jokes", "funny", "humor"],
+                    "responses": [
+                        "Why did the computer show up at work late? It had a hard drive! 😄",
+                        "Why don't scientists trust atoms? Because they make up everything! 😂",
+                        "Why did the math book look sad? Because it had too many problems.",
+                        "Want to hear another joke? Just ask!"
+                    ]
+                },
+                {
+                    "tag": "age",
+                    "patterns": ["how old are you", "what's your age", "age", "old"],
+                    "responses": [
+                        "I'm as young as the code that created me! Age is just a number for a chatbot. 😁",
+                        "I was born the moment you started this chat!",
+                        "Old enough to be wise, young enough to learn new things!"
+                    ]
+                },
+                {
+                    "tag": "creator",
+                    "patterns": ["who created you", "who is your creator", "who made you", "developer"],
+                    "responses": [
+                        "I was created by a developer using Python! 🐍",
+                        "A human programmer brought me to life. Do you like coding?",
+                        "My creator loves technology and helping people!"
+                    ]
+                },
+                {
+                    "tag": "feeling",
+                    "patterns": ["how are you", "how are you feeling", "are you okay", "feeling"],
+                    "responses": [
+                        "I'm just a bunch of code, but I'm always happy to chat! How are you?",
+                        "I'm always here to help you! How are you feeling today?",
+                        "I'm doing great, thanks for asking!"
+                    ]
+                },
+                {
+                    "tag": "unknown",
+                    "patterns": [],
+                    "responses": [
+                        "Sorry, I didn't understand that. Could you say it another way?",
+                        "Can you rephrase your question? I'm here to help!",
+                        "I'm not sure I understand, but I'm learning every day! 😊",
+                        "Let's try again—what would you like to talk about?"
+                    ]
+                }
+            ]
+        };
+
+        // NLP Function to predict intent
+        function predictIntent(userInput) {
+            const input = userInput.toLowerCase();
+            
+            for (const intent of intentsData.intents) {
+                if (intent.tag === "unknown") continue;
+                
+                for (const pattern of intent.patterns) {
+                    if (input.includes(pattern.toLowerCase())) {
+                        return intent.tag;
+                    }
+                }
+            }
+            
+            return "unknown";
+        }
+
+        // Get response based on intent
+        function getResponse(tag) {
+            const intent = intentsData.intents.find(i => i.tag === tag);
+            if (intent && intent.responses.length > 0) {
+                return intent.responses[Math.floor(Math.random() * intent.responses.length)];
+            }
+            return "Sorry, I didn't understand that. Can you rephrase?";
+        }
+
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Add message to chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+            avatar.textContent = isUser ? '👤' : '🤖';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = message;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Process user message
+        async function processMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            userInput.value = '';
+            sendButton.disabled = true;
+            
+            // Show typing indicator
+            showTyping();
+            
+            // Simulate processing delay
+            setTimeout(() => {
+                hideTyping();
+                
+                // Get bot response using NLP
+                const intent = predictIntent(message);
+                const response = getResponse(intent);
+                
+                addMessage(response, false);
+                sendButton.disabled = false;
+                userInput.focus();
+            }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', processMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendButton.disabled) {
+                processMessage();
+            }
+        });
+
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            userInput.focus();
+        });
+
+        // Add initial greeting after a short delay
+        setTimeout(() => {
+            addMessage("Hello! I'm your AI chatbot assistant. I can help answer questions, tell jokes, or just have a friendly conversation. What would you like to talk about?", false);
+        }, 500);
+    </script>
+</body>
+</html>
