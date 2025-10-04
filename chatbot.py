@@ -5,26 +5,28 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
+# Ensure NLTK resources are available
 def ensure_nltk_resources():
-    resources = {
-        'punkt': 'tokenizers/punkt',
-        'wordnet': 'corpora/wordnet'
-    }
-    for name, path in resources.items():
+    resources = ['punkt_tab', 'wordnet']
+    for resource in resources:
         try:
-            nltk.data.find(path)
+            if resource == 'punkt_tab':
+                nltk.data.find('tokenizers/punkt_tab/english/')
+            else:
+                nltk.data.find('corpora/wordnet')
         except LookupError:
-            nltk.download(name, quiet=True)
-
+            nltk.download(resource, quiet=True)
 
 ensure_nltk_resources()
 
+# Initialize components
 lemmatizer = WordNetLemmatizer()
 
-
+# Load intents and train model
 with open("intents.json", encoding="utf-8") as file:
     data = json.load(file)
 
+# Prepare training data
 corpus = []
 labels = []
 for intent in data["intents"]:
@@ -34,25 +36,22 @@ for intent in data["intents"]:
         corpus.append(" ".join(lemmas))
         labels.append(intent["tag"])
 
+# Train model
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(corpus)
 classifier = MultinomialNB()
 classifier.fit(X, labels)
 
-
 def predict_intent(user_input):
     tokens = nltk.word_tokenize(user_input.lower())
     lemmas = [lemmatizer.lemmatize(word) for word in tokens]
     input_vec = vectorizer.transform([" ".join(lemmas)])
-    prediction = classifier.predict(input_vec)[0]
-    return prediction
-
+    return classifier.predict(input_vec)[0]
 
 def get_response(tag):
     for intent in data["intents"]:
         if intent["tag"] == tag:
             return random.choice(intent["responses"])
-    # If no intent matches, return a default response
     return "Sorry, I didn't understand that. Can you rephrase?"
 
 
